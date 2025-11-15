@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gracias por tu compra</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0d0d0d;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .mensaje {
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(255,255,255,0.1);
+        }
+        h1 {
+            color: #e50914;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            color: white;
+            background: #e50914;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        a:hover {
+            background: #b00710;
+        }
+    </style>
+</head>
+<body>
+
+<div class="mensaje">
+    <h1 id="titulo">¡Gracias por comprar Premium!</h1>
+    <p>Tu suscripción ha sido activada exitosamente.<br>
+    Disfruta de todas las películas sin límites.</p>
+
+    <a href="index.html">Volver al inicio</a>
+</div>
+
+<script>
+    // Obtener parámetros de la URL
+    const params = new URLSearchParams(window.location.search);
+    const nombre = params.get("nombre");
+
+    // Si existe el nombre, personalizamos el mensaje
+    if (nombre) {
+        document.getElementById("titulo").textContent =
+            `¡Gracias, ${nombre}, por comprar Premium!`;
+    }
+</script>
+
+</body>
+</html>
+

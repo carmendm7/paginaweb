@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Los 100 - Streaming</title>
+  <style>
+    :root{--accent:#ff6b6b;--accent-light:#ff9b6b;--muted:#94a3b8;--glass:rgba(255,255,255,0.02);--dark:#0a0f1a;--darker:#050810}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:linear-gradient(135deg,var(--dark) 0%,var(--darker) 100%);color:#e6eef8;font-family:'Segoe UI',Roboto,system-ui,-apple-system;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;min-height:100vh;display:flex;flex-direction:column}
+    
+    header{background:linear-gradient(90deg,rgba(15,23,36,0.95),rgba(15,23,36,0.85));backdrop-filter:blur(10px);padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;gap:16px;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-light));display:flex;align-items:center;justify-content:center;font-weight:700;color:#081020;font-size:24px;box-shadow:0 4px 15px rgba(255,107,107,0.3)}
+    .header-title{display:flex;flex-direction:column;gap:2px}
+    h1{font-size:20px;margin:0;font-weight:700;letter-spacing:0.5px}
+    .header-subtitle{font-size:12px;color:var(--accent);opacity:0.9;font-weight:600}
+    main{padding:32px 24px;max-width:1600px;margin:0 auto;flex:1;width:100%}
+    .btn-back{background:rgba(255,255,255,0.05);color:var(--accent);padding:10px 14px;border:1px solid rgba(255,107,107,0.3);border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:24px;transition:all .3s ease;font-weight:600;font-size:14px}
+    .btn-back:hover{background:var(--accent);color:#081020;border-color:var(--accent)}
+    
+    /* seasons */
+    .seasons-wrap{margin-bottom:28px;display:flex;flex-direction:column;gap:12px}
+    .seasons-label{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);font-weight:700}
+    #seasonsToggle{background:linear-gradient(135deg,rgba(255,107,107,0.1),rgba(255,155,107,0.05));border:1.5px solid var(--accent);color:var(--accent);padding:12px 16px;border-radius:8px;cursor:pointer;font-weight:600;transition:all .3s ease;font-size:14px;display:flex;align-items:center;gap:8px;width:fit-content}
+    #seasonsToggle:hover{background:var(--accent);color:#081020;transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,107,107,0.3)}
+    #seasonsPanel{display:none;gap:10px;flex-wrap:wrap;animation:slideDown 0.3s ease}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    .season-btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);color:var(--muted);padding:10px 14px;border-radius:8px;cursor:pointer;transition:all .2s ease;font-weight:600;font-size:13px}
+    .season-btn:hover{background:rgba(255,107,107,0.2);border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+    .season-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#081020;border-color:transparent;box-shadow:0 4px 15px rgba(255,107,107,0.3)}
+    
+    /* container video + anuncio */
+    .video-ad-container{display:grid;grid-template-columns:1fr 320px;gap:24px;margin-bottom:40px;align-items:start}
+    
+    .video-section{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border-radius:16px;padding:24px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.2);backdrop-filter:blur(10px);transition:all .3s ease}
+    .video-section:hover{border-color:rgba(255,107,107,0.3);box-shadow:0 12px 40px rgba(255,107,107,0.1)}
+    .video-container{width:100%;border-radius:12px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.4);background:#000}
+    video{width:100%;display:block;background:#000}
+    .video-title-large{color:var(--accent);font-size:16px;font-weight:700;margin:16px 0 6px 0}
+    .video-info{color:var(--muted);font-size:13px;line-height:1.6}
+    .video-info p{margin:4px 0}
+    
+    /* anuncio premium */
+    .ad-section{background:linear-gradient(135deg,rgba(255,107,107,0.15),rgba(255,155,107,0.08));border-radius:16px;padding:24px;border:1.5px solid rgba(255,107,107,0.4);display:flex;flex-direction:column;gap:16px;box-shadow:0 12px 40px rgba(255,107,107,0.15);backdrop-filter:blur(10px);position:sticky;top:100px;transition:all .3s ease}
+    .ad-section:hover{border-color:var(--accent);box-shadow:0 16px 50px rgba(255,107,107,0.25)}
+    .ad-badge{background:var(--accent);color:#081020;padding:6px 10px;border-radius:6px;font-size:10px;font-weight:700;align-self:flex-start;text-transform:uppercase;letter-spacing:0.5px}
+    .ad-title{color:var(--accent);font-size:20px;font-weight:700;margin:0;line-height:1.2}
+    .ad-desc{color:#cfe3ff;font-size:13px;line-height:1.6;margin:0}
+    .ad-btn{background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#081020;padding:12px 18px;border:none;border-radius:8px;cursor:pointer;font-weight:700;text-decoration:none;text-align:center;transition:all .2s ease;font-size:14px;text-transform:uppercase;letter-spacing:0.5px}
+    .ad-btn:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(255,107,107,0.4)}
+    .ad-features{font-size:12px;color:var(--muted);list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+    .ad-features li{padding:0;padding-left:24px;position:relative}
+    .ad-features li:before{content:'✓';position:absolute;left:0;color:var(--accent);font-weight:700;font-size:14px}
+    .ad-disclaimer{font-size:10px;color:var(--muted);text-align:center;margin:0;opacity:0.8}
+    
+    /* social links */
+    .social-links{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);justify-content:center}
+    .social-link{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--accent);text-decoration:none;transition:all .2s ease;font-size:16px}
+    .social-link:hover{background:var(--accent);color:#081020;transform:translateY(-3px);box-shadow:0 4px 12px rgba(255,107,107,0.3)}
+    
+    /* episodes */
+    .episodes-section h3{color:var(--accent);margin:0 0 24px;font-size:22px;font-weight:700;letter-spacing:0.5px}
+    .episodes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+    .episode-card{background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.06);transition:all .3s cubic-bezier(0.34,1.56,0.64,1);cursor:pointer;overflow:hidden;position:relative}
+    .episode-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);transition:left .5s ease}
+    .episode-card:hover::before{left:100%}
+    .episode-card:hover{transform:translateY(-8px);border-color:rgba(255,107,107,0.4);box-shadow:0 12px 30px rgba(255,107,107,0.15);background:linear-gradient(180deg,rgba(255,107,107,0.08),rgba(255,155,107,0.03))}
+    .episode-card.active{border-color:var(--accent);background:rgba(255,107,107,0.1);box-shadow:0 8px 25px rgba(255,107,107,0.2)}
+    .episode-num{color:var(--accent);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;opacity:0.8}
+    .episode-title{color:#e6eef8;font-weight:700;margin:8px 0 6px 0;font-size:15px;line-height:1.3}
+    .episode-desc{color:var(--muted);font-size:12px;margin:8px 0 12px 0;line-height:1.5;opacity:0.85}
+    .btn-watch{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#081020;padding:10px 14px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:700;border:none;cursor:pointer;transition:all .2s ease;text-transform:uppercase;letter-spacing:0.3px;margin-top:4px}
+    .btn-watch:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(255,107,107,0.3)}
+    
+    footer{text-align:center;padding:24px;color:var(--muted);font-size:12px;border-top:1px solid rgba(255,255,255,0.05);margin-top:40px;letter-spacing:0.3px}
+    
+    @media (max-width:1024px){
+      .video-ad-container{grid-template-columns:1fr;gap:20px}
+      .ad-section{position:static;width:100%}
+      .episodes-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+    }
+    @media (max-width:768px){
+      main{padding:20px 16px}
+      .header-title{display:none}
+      h1{font-size:18px}
+      .episodes-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+      .episode-card{padding:14px}
+      .ad-section{border-radius:12px;padding:18px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">🎬</div>
+    <div class="header-title">
+      <h1>Los 100</h1>
+      <span class="header-subtitle">Streaming Oficial</span>
+    </div>
+  </header>
+
+  <main>
+    <a class="btn-back" href="index.html">← Volver al inicio</a>
+
+    <!-- Control de temporadas -->
+    <div class="seasons-wrap">
+      <span class="seasons-label">Elige tu temporada</span>
+      <button id="seasonsToggle" aria-expanded="false">▼ Selecciona Temporada</button>
+      <div id="seasonsPanel" aria-hidden="true"></div>
+    </div>
+
+    <!-- Video + Anuncio lado a lado -->
+    <div class="video-ad-container">
+      <!-- Sección de Video -->
+      <div class="video-section">
+        <div class="video-container">
+          <video id="videoPlayer" controls width="100%">
+            <source id="videoSource" src="../serie/Los 100- temporada1 episodio1.mp4" type="video/mp4">
+          </video>
+        </div>
+        <h3 class="video-title-large" id="videoTitle">Temporada 1 • Episodio 1: Pilot</h3>
+        <div class="video-info">
+          <p>📺 Haz clic en cualquier episodio para reproducirlo</p>
+          <p>⚡ Cambio instantáneo entre capítulos</p>
+        </div>
+      </div>
+
+      <!-- Anuncio Premium -->
+      <div class="ad-section">
+        <span class="ad-badge">🔥 Premium</span>
+        <h3 class="ad-title">Acceso Total</h3>
+        <p class="ad-desc">Disfruta sin límites ni interrupciones</p>
+        <ul class="ad-features">
+          <li>4K Ultra HD</li>
+          <li>Sin anuncios</li>
+          <li>Descarga offline</li>
+          <li>Múltiples pantallas</li>
+        </ul>
+        <a href="http://127.0.0.1:5500/pagina/contact.html">
+        <button class="ad-btn">Activar Ahora</button>
+        <p class="ad-disclaimer">Primer mes gratis • Cancela cuando quieras</p>
+        </a>
+        
+        <!-- Redes Sociales -->
+        <div class="social-links">
+          <a href="https://instagram.com" target="_blank" class="social-link" title="Instagram">📷</a>
+          <a href="https://tiktok.com" target="_blank" class="social-link" title="TikTok">🎵</a>
+          <a href="https://youtube.com" target="_blank" class="social-link" title="YouTube">▶️</a>
+          <a href="https://twitter.com" target="_blank" class="social-link" title="Twitter">𝕏</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección de Episodios -->
+    <div class="episodes-section">
+      <h3 id="seasonTitle">Episodios - Temporada 1</h3>
+      <div class="episodes-grid" id="episodios"></div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Los 100 Streaming • Todos los derechos reservados</p>
+  </footer>
+
+  <script>
+    const seasons = {
+      1: [
+        { num:1, titulo:'Pilot', desc:'El viaje comienza cuando 100 presos son enviados a la Tierra.', video:'Los 100- temporada1 episodio1.mp4' },
+        { num:2, titulo:'Earth Kills', desc:'Los jóvenes descubren que la Tierra es mucho más peligrosa.', video:'Los 100- temporada1 episodio2.mp4' },
+        { num:3, titulo:'Earth Kills', desc:'La supervivencia se vuelve cada vez más complicada.', video:'Los 100- temporada1 episodio3.mp4' },
+        { num:4, titulo:'Murphy\'s Law', desc:'Murphy causa problemas en el campamento.', video:'Los 100- temporada1 episodio4.mp4' },
+        { num:5, titulo:'Twilight\'s Last Gleaming', desc:'Los misterios de la Tierra se revelan.', video:'Los 100- temporada1 episodio5.mp4' },
+        { num:6, titulo:'His Sister\'s Keeper', desc:'Lazos familiares se ponen a prueba.', video:'Los 100- temporada1 episodio6.mp4' },
+        { num:7, titulo:'Contents Under Pressure', desc:'La presión del conflicto aumenta.', video:'Los 100- temporada1 episodio7.mp4' },
+        { num:8, titulo:'Day Trip', desc:'Una expedición cambia todo.', video:'Los 100- temporada1 episodio8.mp4' },
+        { num:9, titulo:'Unity Day', desc:'Un día de unidad lleno de sorpresas.', video:'Los 100- temporada1 episodio9.mp4' },
+        { num:10, titulo:'I Am Become Death', desc:'Las consecuencias de las decisiones anteriores.', video:'Los 100- temporada1 episodio10.mp4' },
+        { num:11, titulo:'The Calm', desc:'La calma antes de la tormenta.', video:'Los 100- temporada1 episodio11.mp4' },
+        { num:12, titulo:'We Are Grounders (Part 1)', desc:'Primera parte del enfrentamiento final.', video:'Los 100- temporada1 episodio12.mp4' },
+        { num:13, titulo:'We Are Grounders (Part 2)', desc:'La temporada culmina con un giro épico.', video:'Los 100- temporada1 episodio13.mp4' }
+      ],
+      2: [{ num:1, titulo:'Episodio 1', desc:'Temporada 2 - Episodio 1', video:'Los 100- temporada2 episodio1.mp4' },{ num:2, titulo:'Episodio 2', desc:'Temporada 2 - Episodio 2', video:'Los 100- temporada2 episodio2.mp4' }],
+      3: [{ num:1, titulo:'Episodio 1', desc:'Temporada 3 - Episodio 1', video:'Los 100- temporada3 episodio1.mp4' },{ num:2, titulo:'Episodio 2', desc:'Temporada 3 - Episodio 2', video:'Los 100- temporada3 episodio2.mp4' }],
+      4: [{ num:1, titulo:'Episodio 1', desc:'Temporada 4 - Episodio 1', video:'Los 100- temporada4 episodio1.mp4' },{ num:2, titulo:'Episodio 2', desc:'Temporada 4 - Episodio 2', video:'Los 100- temporada4 episodio2.mp4' }],
+      5: [{ num:1, titulo:'Episodio 1', desc:'Temporada 5 - Episodio 1', video:'Los 100- temporada5 episodio1.mp4' },{ num:2, titulo:'Episodio 2', desc:'Temporada 5 - Episodio 2', video:'Los 100- temporada5 episodio2.mp4' }],
+      6: [{ num:1, titulo:'Episodio 1', desc:'Temporada 6 - Episodio 1', video:'Los 100- temporada6 episodio1.mp4' },{ num:2, titulo:'Episodio 2', desc:'Temporada 6 - Episodio 2', video:'Los 100- temporada6 episodio2.mp4' }],
+      7: [{ num:1, titulo:'Episodio 1', desc:'Temporada 7 - Episodio 1', video:'Los 100- temporada7 episodio1.mp4' },{ num:2, titulo:'Episodio 2', desc:'Temporada 7 - Episodio 2', video:'Los 100- temporada7 episodio2.mp4' }]
+    };
+
+    const episodiosContainer = document.getElementById('episodios');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const videoSource = document.getElementById('videoSource');
+    const videoTitle = document.getElementById('videoTitle');
+    const seasonTitle = document.getElementById('seasonTitle');
+    const seasonsPanel = document.getElementById('seasonsPanel');
+    const seasonsToggle = document.getElementById('seasonsToggle');
+    let selectedSeason = 1;
+
+    function buildSeasonButtons() {
+      seasonsPanel.innerHTML = '';
+      for (let s = 1; s <= 7; s++) {
+        const btn = document.createElement('button');
+        btn.className = 'season-btn' + (s === selectedSeason ? ' active' : '');
+        btn.textContent = `Temporada ${s}`;
+        btn.dataset.season = s;
+        btn.addEventListener('click', () => selectSeason(parseInt(btn.dataset.season, 10)));
+        seasonsPanel.appendChild(btn);
+      }
+    }
+
+    seasonsToggle.addEventListener('click', () => {
+      const isOpen = seasonsPanel.style.display === 'flex';
+      seasonsPanel.style.display = isOpen ? 'none' : 'flex';
+      seasonsToggle.setAttribute('aria-expanded', String(!isOpen));
+      seasonsPanel.setAttribute('aria-hidden', String(isOpen));
+    });
+
+    function selectSeason(season) {
+      selectedSeason = season;
+      document.querySelectorAll('.season-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.season, 10) === season));
+      seasonsPanel.style.display = 'none';
+      seasonsToggle.setAttribute('aria-expanded', 'false');
+      seasonsPanel.setAttribute('aria-hidden', 'true');
+      renderEpisodesForSeason(season);
+      const first = seasons[season] && seasons[season][0];
+      if (first) {
+        videoSource.src = '../serie/' + first.video;
+        videoPlayer.load();
+        videoTitle.textContent = `Temporada ${season} • Episodio ${first.num}: ${first.titulo}`;
+      }
+      document.querySelector('.video-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderEpisodesForSeason(season) {
+      const eps = seasons[season] || [];
+      episodiosContainer.innerHTML = '';
+      seasonTitle.textContent = `Episodios - Temporada ${season}`;
+      eps.forEach((ep, index) => {
+        const card = document.createElement('div');
+        card.className = 'episode-card' + (index === 0 ? ' active' : '');
+        card.innerHTML = `
+          <div class="episode-num">Ep. ${ep.num}</div>
+          <div class="episode-title">${ep.titulo}</div>
+          <div class="episode-desc">${ep.desc}</div>
+          <button class="btn-watch" type="button">▶ Ver</button>
+        `;
+        card.querySelector('.btn-watch').addEventListener('click', (e) => {
+          e.preventDefault();
+          playEpisode(ep, card, season);
+        });
+        episodiosContainer.appendChild(card);
+      });
+    }
+
+    function playEpisode(ep, cardElement, season) {
+      videoPlayer.pause();
+      videoSource.src = '../serie/' + ep.video;
+      videoPlayer.load();
+      setTimeout(() => videoPlayer.play(), 100);
+      videoTitle.textContent = `Temporada ${season} • Episodio ${ep.num}: ${ep.titulo}`;
+      document.querySelectorAll('.episode-card').forEach(c => c.classList.remove('active'));
+      cardElement.classList.add('active');
+      document.querySelector('.video-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    buildSeasonButtons();
+    selectSeason(1);
+  </script>
+</body>
+</html>
